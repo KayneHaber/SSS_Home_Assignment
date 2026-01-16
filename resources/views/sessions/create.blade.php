@@ -1,60 +1,53 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Jam Session</title>
-</head>
-<body>
-    <h1>Add Jam Session</h1>
+@extends('layouts.app')
 
-    <p><a href="{{ route('sessions.index') }}">Back</a></p>
+@section('title', 'Add Jam Session')
 
-    @if ($errors->any())
-        <div>
-            <strong>Please fix the errors below.</strong>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+@section('content')
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">Add Jam Session</h1>
+        <a class="btn btn-outline-secondary" href="{{ route('sessions.index') }}">Back</a>
+    </div>
 
-    <form method="POST" action="{{ route('sessions.store') }}">
+    <form method="POST" action="{{ route('sessions.store') }}" class="card p-3">
         @csrf
 
-        <h3>Venue</h3>
-        <p>
-            <label>Venue name</label><br>
-            <input type="text" name="venue_name" value="{{ old('venue_name') }}">
-        </p>
+        <h5 class="mb-3">Venue</h5>
 
-        <p>
-            <label>Venue address</label><br>
-            <input type="text" name="venue_address" value="{{ old('venue_address') }}">
-        </p>
+        <div class="mb-3">
+            <label class="form-label">Venue name</label>
+            <input class="form-control" type="text" name="venue_name" value="{{ old('venue_name') }}">
+        </div>
 
-        <h3>Session</h3>
-        <p>
-            <label>Title</label><br>
-            <input type="text" name="title" value="{{ old('title') }}">
-        </p>
+        <div class="mb-3">
+            <label class="form-label">Venue address</label>
+            <input class="form-control" type="text" name="venue_address" value="{{ old('venue_address') }}">
+            <div class="form-text">This address is checked using an external validation API.</div>
+        </div>
 
-        <p>
-            <label>Genre</label><br>
-            <input type="text" name="genre" value="{{ old('genre') }}">
-        </p>
+        <hr>
 
-        <p>
-            <label>Starts at</label><br>
-            <input type="datetime-local" name="starts_at" value="{{ old('starts_at') }}">
-        </p>
+        <h5 class="mb-3">Session</h5>
 
-        <p>
-            <label>Description</label><br>
-            <textarea name="description" rows="4" cols="40">{{ old('description') }}</textarea>
-        </p>
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input class="form-control" type="text" name="title" value="{{ old('title') }}">
+        </div>
 
-        <button type="submit">Create</button>
+        <div class="mb-3">
+            <label class="form-label">Genre</label>
+            <input class="form-control" type="text" name="genre" value="{{ old('genre') }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Starts at</label>
+            <input class="form-control" type="datetime-local" name="starts_at" value="{{ old('starts_at') }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="4">{{ old('description') }}</textarea>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Create</button>
     </form>
-</body>
-</html>
+@endsection

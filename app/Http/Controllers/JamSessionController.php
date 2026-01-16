@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\JamSession;
 use App\Models\Venue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class JamSessionController extends Controller
 {
@@ -25,6 +26,12 @@ class JamSessionController extends Controller
     public function store(Request $request)
     {
         $data = $this->validatedData($request);
+
+        if (!$this->addressIsValidViaApi($data['venue_address'] ?? null)) {
+            return back()
+                ->withInput()
+                ->withErrors(['venue_address' => 'Venue address could not be validated by the external API. Please enter a real address.']);
+        }
 
         $venue = Venue::firstOrCreate(
             ['name' => $data['venue_name']],
@@ -58,6 +65,12 @@ class JamSessionController extends Controller
     {
         $data = $this->validatedData($request);
 
+        if (!$this->addressIsValidViaApi($data['venue_address'] ?? null)) {
+            return back()
+                ->withInput()
+                ->withErrors(['venue_address' => 'Venue address could not be validated by the external API. Please enter a real address.']);
+        }
+
         $venue = Venue::firstOrCreate(
             ['name' => $data['venue_name']],
             ['address' => $data['venue_address'] ?? null]
@@ -84,12 +97,38 @@ class JamSessionController extends Controller
     {
         return $request->validate([
             'venue_name' => ['required', 'string', 'max:255'],
-            'venue_address' => ['nullable', 'string', 'max:255'],
+            'venue_address' => ['required', 'string', 'max:255'],
 
             'title' => ['required', 'string', 'max:255'],
             'genre' => ['required', 'string', 'max:255'],
             'starts_at' => ['required', 'date'],
             'description' => ['nullable', 'string', 'max:1000'],
         ]);
+    }
+
+    private function addressIsValidViaApi(?string $address): bool
+    {
+        if (!$address) {
+            return false;
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => 'JamSesh Laravel Student App',
+            ])->get('https://nominatim.openstreetmap.org/search', [
+                'q' => $address,
+                'format' => 'json',
+                'limit' => 1,
+            ]);
+
+            if (!$response->ok()) {
+                return true;
+            }
+
+            $data = $response->json();
+            return is_array($data) && count($data) > 0;
+        } catch (\Throwable $e) {
+            return true;
+        }
     }
 }

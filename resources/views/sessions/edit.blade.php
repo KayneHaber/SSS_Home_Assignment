@@ -1,61 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Jam Session</title>
-</head>
-<body>
-    <h1>Edit Jam Session</h1>
+@extends('layouts.app')
 
-    <p><a href="{{ route('sessions.show', $session) }}">Back</a></p>
+@section('title', 'Edit Jam Session')
 
-    @if ($errors->any())
-        <div>
-            <strong>Please fix the errors below.</strong>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+@section('content')
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">Edit Jam Session</h1>
+        <a class="btn btn-outline-secondary" href="{{ route('sessions.show', $session) }}">Back</a>
+    </div>
 
-    <form method="POST" action="{{ route('sessions.update', $session) }}">
+    <form method="POST" action="{{ route('sessions.update', $session) }}" class="card p-3">
         @csrf
         @method('PUT')
 
-        <h3>Venue</h3>
-        <p>
-            <label>Venue name</label><br>
-            <input type="text" name="venue_name" value="{{ old('venue_name', $session->venue->name ?? '') }}">
-        </p>
+        <h5 class="mb-3">Venue</h5>
 
-        <p>
-            <label>Venue address</label><br>
-            <input type="text" name="venue_address" value="{{ old('venue_address', $session->venue->address ?? '') }}">
-        </p>
+        <div class="mb-3">
+            <label class="form-label">Venue name</label>
+            <input class="form-control" type="text" name="venue_name" value="{{ old('venue_name', $session->venue->name ?? '') }}">
+        </div>
 
-        <h3>Session</h3>
-        <p>
-            <label>Title</label><br>
-            <input type="text" name="title" value="{{ old('title', $session->title) }}">
-        </p>
+        <div class="mb-3">
+            <label class="form-label">Venue address</label>
+            <input class="form-control" type="text" name="venue_address" value="{{ old('venue_address', $session->venue->address ?? '') }}">
+            <div class="form-text">This address is checked using an external validation API.</div>
+        </div>
 
-        <p>
-            <label>Genre</label><br>
-            <input type="text" name="genre" value="{{ old('genre', $session->genre) }}">
-        </p>
+        <hr>
 
-        <p>
-            <label>Starts at</label><br>
-            <input type="datetime-local" name="starts_at" value="{{ old('starts_at', \Carbon\Carbon::parse($session->starts_at)->format('Y-m-d\TH:i')) }}">
-        </p>
+        <h5 class="mb-3">Session</h5>
 
-        <p>
-            <label>Description</label><br>
-            <textarea name="description" rows="4" cols="40">{{ old('description', $session->description) }}</textarea>
-        </p>
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input class="form-control" type="text" name="title" value="{{ old('title', $session->title) }}">
+        </div>
 
-        <button type="submit">Save</button>
+        <div class="mb-3">
+            <label class="form-label">Genre</label>
+            <input class="form-control" type="text" name="genre" value="{{ old('genre', $session->genre) }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Starts at</label>
+            <input class="form-control" type="datetime-local" name="starts_at" value="{{ old('starts_at', \Carbon\Carbon::parse($session->starts_at)->format('Y-m-d\TH:i')) }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="4">{{ old('description', $session->description) }}</textarea>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Save</button>
     </form>
-</body>
-</html>
+@endsection
