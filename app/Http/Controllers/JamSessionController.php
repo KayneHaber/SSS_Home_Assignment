@@ -9,13 +9,55 @@ use Illuminate\Support\Facades\Http;
 
 class JamSessionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $sessions = JamSession::with('venue')
-            ->orderBy('starts_at', 'asc')
-            ->get();
+        $query = JamSession::query()->with('venue');
 
-        return view('sessions.index', compact('sessions'));
+        // Filters
+        if ($request->filled('genre')) {
+            $query->where('genre', 'like', '%' . $request->string('genre')->toString() . '%');
+        }
+
+        if ($request->filled('venue')) {
+            $venueTerm = $request->string('venue')->toString();
+            $query->whereHas('venue', function ($q) use ($venueTerm) {
+                $q->where('name', 'like', '%' . $venueTerm . '%');
+            });
+        }
+
+        if ($request->filled('from')) {
+            $query->where('starts_at', '>=', $request->input('from'));
+        }
+
+        if ($request->filled('to')) {
+            $query->where('starts_at', '<=', $request->input('to'));
+        }
+
+        // Sorting
+        $allowedSorts = ['starts_at', 'title', 'genre', 'created_at'];
+        $sort = $request->input('sort', 'starts_at');
+        $direction = $request->input('direction', 'asc');
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'starts_at';
+        }
+        if (!in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'asc';
+        }
+
+        $sessions = $query->orderBy($sort, $direction)->get();
+
+        return view('sessions.index', [
+            'sessions' => $sessions,
+            'filters' => [
+                'genre' => $request->input('genre', ''),
+                'venue' => $request->input('venue', ''),
+                'from' => $request->input('from', ''),
+                'to' => $request->input('to', ''),
+                'sort' => $sort,
+                'direction' => $direction,
+            ],
+        ]);
     }
 
     public function create()

@@ -8,35 +8,52 @@
         <a class="btn btn-primary" href="{{ route('sessions.create') }}">Add Jam Session</a>
     </div>
 
-    @if ($sessions->isEmpty())
-        <div class="alert alert-info mb-0">No jam sessions yet.</div>
-    @else
-        <div class="list-group">
-            @foreach ($sessions as $s)
-                <div class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-start gap-3">
-                        <div>
-                            <h5 class="mb-1">{{ $s->title }}</h5>
-                            <div class="text-muted small">
-                                Genre: {{ $s->genre }},
-                                Starts: {{ \Carbon\Carbon::parse($s->starts_at)->format('d M Y, H:i') }},
-                                Venue: {{ $s->venue->name ?? 'N/A' }}
-                            </div>
-                        </div>
+    <form method="GET" action="{{ route('sessions.index') }}" class="card p-3 mb-3">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Genre contains</label>
+                <input class="form-control" type="text" name="genre" value="{{ $filters['genre'] }}">
+            </div>
 
-                        <div class="d-flex gap-2">
-                            <a class="btn btn-outline-secondary btn-sm" href="{{ route('sessions.show', $s) }}">View</a>
-                            <a class="btn btn-outline-primary btn-sm" href="{{ route('sessions.edit', $s) }}">Edit</a>
+            <div class="col-md-3">
+                <label class="form-label">Venue contains</label>
+                <input class="form-control" type="text" name="venue" value="{{ $filters['venue'] }}">
+            </div>
 
-                            <form method="POST" action="{{ route('sessions.destroy', $s) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-outline-danger btn-sm" type="submit">Delete</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
+            <div class="col-md-3">
+                <label class="form-label">From (starts at)</label>
+                <input class="form-control" type="datetime-local" name="from" value="{{ $filters['from'] }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">To (starts at)</label>
+                <input class="form-control" type="datetime-local" name="to" value="{{ $filters['to'] }}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Sort by</label>
+                <select class="form-select" name="sort">
+                    <option value="starts_at" @selected($filters['sort'] === 'starts_at')>Start time</option>
+                    <option value="title" @selected($filters['sort'] === 'title')>Title</option>
+                    <option value="genre" @selected($filters['sort'] === 'genre')>Genre</option>
+                    <option value="created_at" @selected($filters['sort'] === 'created_at')>Created date</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Direction</label>
+                <select class="form-select" name="direction">
+                    <option value="asc" @selected($filters['direction'] === 'asc')>Ascending</option>
+                    <option value="desc" @selected($filters['direction'] === 'desc')>Descending</option>
+                </select>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-end gap-2">
+                <button class="btn btn-dark" type="submit">Apply</button>
+                <a class="btn btn-outline-secondary" href="{{ route('sessions.index') }}">Reset</a>
+            </div>
         </div>
-    @endif
+    </form>
+
+    @include('sessions._list', ['sessions' => $sessions])
 @endsection
